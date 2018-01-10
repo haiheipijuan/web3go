@@ -33,7 +33,7 @@ import (
 	"encoding/json"
 	"math/big"
 
-	"github.com/alanchchen/web3go/common"
+	"github.com/haiheipijuan/web3go/common"
 )
 
 type jsonBlock struct {
@@ -80,29 +80,43 @@ func (b *jsonBlock) ToBlock() (block *common.Block) {
 	return block
 }
 
+type Transaction struct {
+	Hash             string `json:"hash"`
+	Nonce            string `json:"nonce"`
+	BlockHash        string `json:"blockHash"`
+	BlockNumber      string `json:"blockNumber"`
+	TransactionIndex string `json:"transactionIndex"`
+	From             string `json:"from"`
+	To               string `json:"to"`
+	Gas              string `json:"gas"`
+	GasPrice         string `json:"gasprice"`
+	Value            string `json:"value"`
+	Data             string `json:"input"`
+}
+
 type jsonTransaction struct {
-	Hash             common.Hash    `json:"hash"`
-	Nonce            common.Hash    `json:"nonce"`
-	BlockHash        common.Hash    `json:"blockHash"`
-	BlockNumber      json.Number    `json:"blockNumber"`
-	TransactionIndex uint64         `json:"transactionIndex"`
-	From             common.Address `json:"from"`
-	To               common.Address `json:"to"`
-	Gas              json.Number    `json:"gas"`
-	GasPrice         json.Number    `json:"gasprice"`
-	Value            json.Number    `json:"value"`
-	Data             []byte         `json:"input"`
+	Hash             string      `json:"hash"`
+	Nonce            string      `json:"nonce"`
+	BlockHash        string      `json:"blockHash"`
+	BlockNumber      json.Number `json:"blockNumber"`
+	TransactionIndex uint64      `json:"transactionIndex"`
+	From             string      `json:"from"`
+	To               string      `json:"to"`
+	Gas              json.Number `json:"gas"`
+	GasPrice         json.Number `json:"gasprice"`
+	Value            json.Number `json:"value"`
+	Data             []byte      `json:"input"`
 }
 
 func (t *jsonTransaction) ToTransaction() (tx *common.Transaction) {
 	tx = &common.Transaction{}
-	tx.Hash = t.Hash
-	tx.Nonce = t.Nonce
-	tx.BlockHash = t.BlockHash
+	tx.Hash = common.NewHash(common.HexToBytes(t.Hash))
+	tx.Nonce = common.NewHash(common.HexToBytes(t.Nonce))
+	tx.BlockHash = common.NewHash(common.HexToBytes(t.BlockHash))
 	tx.BlockNumber = jsonNumbertoInt(t.BlockNumber)
 	tx.TransactionIndex = t.TransactionIndex
-	tx.From = t.From
-	tx.To = t.To
+	tx.From = common.NewAddress(common.HexToBytes(t.From))
+	tx.To = common.NewAddress(common.HexToBytes(t.To))
 	tx.Gas = jsonNumbertoInt(t.Gas)
 	tx.GasPrice = jsonNumbertoInt(t.GasPrice)
 	tx.Value = jsonNumbertoInt(t.Value)

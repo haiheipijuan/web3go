@@ -35,8 +35,8 @@ import (
 	"math/big"
 	"strconv"
 
-	"github.com/alanchchen/web3go/common"
-	"github.com/alanchchen/web3go/rpc"
+	"github.com/haiheipijuan/web3go/common"
+	"github.com/haiheipijuan/web3go/rpc"
 )
 
 // Eth ...
@@ -64,7 +64,7 @@ type Eth interface {
 	EstimateGas(tx *common.TransactionRequest, quantity string) (*big.Int, error)
 	GetBlockByHash(hash common.Hash, full bool) (*common.Block, error)
 	GetBlockByNumber(quantity string, full bool) (*common.Block, error)
-	GetTransactionByHash(hash common.Hash) (*common.Transaction, error)
+	GetTransactionByHash(hash common.Hash) (*Transaction, error)
 	GetTransactionByBlockHashAndIndex(hash common.Hash, index uint64) (*common.Transaction, error)
 	GetTransactionByBlockNumberAndIndex(quantity string, index uint64) (*common.Transaction, error)
 	GetTransactionReceipt(hash common.Hash) (*common.TransactionReceipt, error)
@@ -544,13 +544,17 @@ func (eth *EthAPI) GetBlockByHash(hash common.Hash, full bool) (*common.Block, e
 // GetBlockByNumber returns information about a block by block number.
 func (eth *EthAPI) GetBlockByNumber(quantity string, full bool) (*common.Block, error) {
 	req := eth.requestManager.newRequest("eth_getBlockByNumber")
-	req.Set("params", []interface{}{quantity, full})
+	req.Set("params", []interface{}{"0x1", full})
 	resp, err := eth.requestManager.send(req)
 	if err != nil {
+		fmt.Println("[GetBlockByNumber] 1 err:", err)
 		return nil, err
 	}
 
+	fmt.Println("[GetBlockByNumber] resp=", resp)
+
 	if resp.Error() != nil {
+		fmt.Println("[GetBlockByNumber] 2 err:", resp.Error())
 		return nil, resp.Error()
 	}
 
@@ -566,7 +570,7 @@ func (eth *EthAPI) GetBlockByNumber(quantity string, full bool) (*common.Block, 
 
 // GetTransactionByHash returns the information about a transaction requested by
 // transaction hash.
-func (eth *EthAPI) GetTransactionByHash(hash common.Hash) (*common.Transaction, error) {
+func (eth *EthAPI) GetTransactionByHash(hash common.Hash) (*Transaction, error) {
 	req := eth.requestManager.newRequest("eth_getTransactionByHash")
 	req.Set("params", hash.String())
 	resp, err := eth.requestManager.send(req)
@@ -578,10 +582,16 @@ func (eth *EthAPI) GetTransactionByHash(hash common.Hash) (*common.Transaction, 
 		return nil, resp.Error()
 	}
 
-	result := &jsonTransaction{}
+	result := &Transaction{}
+
+	jsonReuslt := resp.Get("result").(map[string]interface{})
+	fmt.Println("mapResult = ", jsonReuslt)
+
 	if jsonBytes, err := json.Marshal(resp.Get("result")); err == nil {
+		fmt.Println("jsonResult = ", string(jsonBytes))
+
 		if err := json.Unmarshal(jsonBytes, result); err == nil {
-			return result.ToTransaction(), nil
+			return result, nil
 		}
 	}
 
