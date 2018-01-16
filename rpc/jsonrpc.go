@@ -33,7 +33,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
-	"reflect"
+	// "reflect"
 	"strings"
 	"sync/atomic"
 )
@@ -59,15 +59,15 @@ func (req *JSONRPCRequest) Set(key string, value interface{}) {
 		req.Method = fmt.Sprintf("%v", value)
 	case "params":
 		req.Params = req.Params[:0]
-		switch reflect.TypeOf(value).Kind() {
-		case reflect.Slice, reflect.Array:
-			v := reflect.ValueOf(value)
-			for i := 0; i < v.Len(); i++ {
-				req.Params = append(req.Params, v.Index(i).String())
-			}
-		default:
-			req.Params = append(req.Params, value)
-		}
+		// switch reflect.TypeOf(value).Kind() {
+		// case reflect.Slice, reflect.Array:
+		// 	v := reflect.ValueOf(value)
+		// 	for i := 0; i < v.Len(); i++ {
+		// 		req.Params = append(req.Params, v.Index(i).String())
+		// 	}
+		// default:
+		req.Params = append(req.Params, value)
+		// }
 	}
 }
 
